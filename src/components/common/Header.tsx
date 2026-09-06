@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
 
 interface HeaderProps {
@@ -21,6 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
   showThemeToggle = true,
 }) => {
   const { colors, isDark, toggleTheme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <View
@@ -29,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
         borderBottomColor: colors.border,
         borderBottomWidth: 1,
         paddingHorizontal: 16,
-        paddingTop: 14,
+        paddingTop: Math.max(insets.top, 12) + 8,
         paddingBottom: 14,
         flexDirection: 'row',
         alignItems: 'center',

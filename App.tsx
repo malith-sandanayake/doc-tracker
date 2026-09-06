@@ -1,8 +1,10 @@
+import 'react-native-get-random-values';
 import './global.css';
 import React from 'react';
+import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { DocumentProvider } from './src/context/DocumentContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
@@ -24,12 +26,12 @@ function MainApp() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top', 'left', 'right']}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <NavigationContainer theme={navigationTheme}>
         <RootNavigator />
       </NavigationContainer>
       <StatusBar style={isDark ? 'light' : 'dark'} />
-    </SafeAreaView>
+    </View>
   );
 }
 

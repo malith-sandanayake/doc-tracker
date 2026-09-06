@@ -11,6 +11,7 @@ import {
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useDocuments } from '../context/DocumentContext';
 import { TypeBadge, StatusBadge, PriorityBadge, TagBadge } from '../components/common/Badge';
@@ -22,6 +23,7 @@ import { RootStackParamList, DocumentStatus } from '../types';
 
 export const DocumentDetailScreen: React.FC = () => {
   const { colors, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, 'DocumentDetail'>>();
   const { documentId } = route.params;
@@ -147,6 +149,8 @@ export const DocumentDetailScreen: React.FC = () => {
           {
             backgroundColor: colors.surface,
             borderBottomColor: colors.border,
+            paddingTop: Math.max(insets.top, 10) + 6,
+            height: 54 + Math.max(insets.top, 10),
           },
         ]}
       >
