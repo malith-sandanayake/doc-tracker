@@ -36,17 +36,51 @@ export const LibraryScreen: React.FC = () => {
   const [activeTypeTab, setActiveTypeTab] = useState<DocumentType | 'all'>(
     route.params?.initialTypeFilter || 'all'
   );
-  const [activeStatusTab, setActiveStatusTab] = useState<DocumentStatus | 'all'>('all');
+  const [activeStatusTab, setActiveStatusTab] = useState<DocumentStatus | 'all'>(
+    route.params?.initialStatusFilter || 'all'
+  );
   const [filterModalVisible, setFilterModalVisible] = useState(false);
 
   const [advancedFilters, setAdvancedFilters] = useState<DocumentFilter>({
     type: route.params?.initialTypeFilter || 'all',
-    status: 'all',
+    status: route.params?.initialStatusFilter || 'all',
     priority: 'all',
     project: route.params?.initialProject,
     tag: route.params?.initialTag,
     sortBy: 'recently_added',
   });
+
+  React.useEffect(() => {
+    if (route.params) {
+      if (route.params.initialTypeFilter !== undefined) {
+        setActiveTypeTab(route.params.initialTypeFilter);
+        setAdvancedFilters((prev) => ({ ...prev, type: route.params?.initialTypeFilter }));
+      } else if (route.params.initialStatusFilter !== undefined || route.params.initialProject !== undefined) {
+        setActiveTypeTab('all');
+        setAdvancedFilters((prev) => ({ ...prev, type: 'all' }));
+      }
+
+      if (route.params.initialStatusFilter !== undefined) {
+        setActiveStatusTab(route.params.initialStatusFilter);
+        setAdvancedFilters((prev) => ({ ...prev, status: route.params?.initialStatusFilter }));
+      } else if (route.params.initialTypeFilter !== undefined || route.params.initialProject !== undefined) {
+        setActiveStatusTab('all');
+        setAdvancedFilters((prev) => ({ ...prev, status: 'all' }));
+      }
+
+      if (route.params.initialProject !== undefined) {
+        setAdvancedFilters((prev) => ({ ...prev, project: route.params?.initialProject }));
+      } else if (route.params.initialTypeFilter !== undefined || route.params.initialStatusFilter !== undefined) {
+        setAdvancedFilters((prev) => ({ ...prev, project: undefined }));
+      }
+
+      if (route.params.initialTag !== undefined) {
+        setAdvancedFilters((prev) => ({ ...prev, tag: route.params?.initialTag }));
+      } else if (route.params.initialTypeFilter !== undefined || route.params.initialStatusFilter !== undefined) {
+        setAdvancedFilters((prev) => ({ ...prev, tag: undefined }));
+      }
+    }
+  }, [route.params]);
 
   // Extract unique projects and tags from existing documents
   const availableProjects = useMemo(() => {

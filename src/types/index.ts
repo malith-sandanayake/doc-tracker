@@ -79,7 +79,14 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   Dashboard: undefined;
-  Library: { initialTypeFilter?: DocumentType; initialTag?: string; initialProject?: string } | undefined;
+  Library:
+    | {
+        initialTypeFilter?: DocumentType | 'all';
+        initialStatusFilter?: DocumentStatus | 'all';
+        initialTag?: string;
+        initialProject?: string;
+      }
+    | undefined;
   Add: undefined;
   Goals: undefined;
 };

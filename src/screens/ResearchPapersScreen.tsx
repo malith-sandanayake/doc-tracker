@@ -64,6 +64,7 @@ export const ResearchPapersScreen: React.FC = () => {
       <Header
         title="Research Papers"
         subtitle={`${filteredPapers.length} papers indexed`}
+        showBackButton={navigation.canGoBack()}
         rightAction={{
           icon: 'add',
           label: 'Add Paper',

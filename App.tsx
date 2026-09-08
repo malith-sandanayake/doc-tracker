@@ -7,7 +7,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { DocumentProvider } from './src/context/DocumentContext';
+import { SidebarProvider } from './src/context/SidebarContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
+import { Sidebar } from './src/components/navigation/Sidebar';
+import { navigationRef } from './src/navigation/navigationRef';
 
 function MainApp() {
   const { isDark, colors } = useTheme();
@@ -27,8 +30,9 @@ function MainApp() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <NavigationContainer theme={navigationTheme}>
+      <NavigationContainer ref={navigationRef} theme={navigationTheme}>
         <RootNavigator />
+        <Sidebar />
       </NavigationContainer>
       <StatusBar style={isDark ? 'light' : 'dark'} />
     </View>
@@ -40,7 +44,9 @@ export default function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <DocumentProvider>
-          <MainApp />
+          <SidebarProvider>
+            <MainApp />
+          </SidebarProvider>
         </DocumentProvider>
       </ThemeProvider>
     </SafeAreaProvider>
