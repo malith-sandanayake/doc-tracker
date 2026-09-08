@@ -75,6 +75,7 @@ export type RootStackParamList = {
   AddDocument: { prefillType?: DocumentType } | undefined;
   EditDocument: { documentId: string };
   ResearchPapers: undefined;
+  Books: undefined;
 };
 
 export type MainTabParamList = {

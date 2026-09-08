@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -27,6 +27,7 @@ import {
 export const AddDocumentScreen: React.FC = () => {
   const { colors, isDark } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'AddDocument'>>();
   const { addDocument, documents } = useDocuments();
 
   // Source selection
@@ -41,20 +42,27 @@ export const AddDocumentScreen: React.FC = () => {
 
   // Core Metadata
   const [title, setTitle] = useState('');
-  const [type, setType] = useState<DocumentType>('research_paper');
+  const [type, setType] = useState<DocumentType>(route.params?.prefillType || 'research_paper');
   const [priority, setPriority] = useState<Priority>('medium');
   const [status, setStatus] = useState<DocumentStatus>('to_read');
   const [linkedProject, setLinkedProject] = useState('');
   const [tagsInput, setTagsInput] = useState('');
+
+  // Book Page Metadata
+  const [totalPages, setTotalPages] = useState('');
+  const [startingPage, setStartingPage] = useState('0');
+
+  useEffect(() => {
+    if (route.params?.prefillType) {
+      setType(route.params.prefillType);
+    }
+  }, [route.params?.prefillType]);
 
   // Research Paper Metadata
   const [authors, setAuthors] = useState('');
   const [year, setYear] = useState('');
   const [venue, setVenue] = useState('');
   const [doi, setDoi] = useState('');
-
-  // Book Metadata
-  const [totalPages, setTotalPages] = useState('');
 
   // Suggestions from existing documents
   const existingProjects = Array.from(
@@ -118,13 +126,30 @@ export const AddDocumentScreen: React.FC = () => {
 
     const parsedYear = year ? parseInt(year, 10) : undefined;
     const parsedPages = totalPages ? parseInt(totalPages, 10) : undefined;
+    const parsedStartingPage = startingPage ? parseInt(startingPage, 10) : 0;
+    const validStartingPage = !isNaN(parsedStartingPage) ? Math.max(0, parsedStartingPage) : 0;
+
+    let computedPage = 0;
+    let computedProgress = 0;
+    let finalStatus = status;
+
+    if (status === 'read' && parsedPages) {
+      computedPage = parsedPages;
+      computedProgress = 100;
+    } else if (validStartingPage > 0 && parsedPages) {
+      computedPage = Math.min(parsedPages, validStartingPage);
+      computedProgress = Math.round((computedPage / parsedPages) * 100);
+      if (finalStatus === 'to_read') {
+        finalStatus = 'in_progress';
+      }
+    }
 
     try {
       const created = await addDocument({
         title: title.trim(),
         type,
         priority,
-        status,
+        status: finalStatus,
         source,
         linked_project: linkedProject.trim() || undefined,
         tags: parsedTags,
@@ -133,8 +158,8 @@ export const AddDocumentScreen: React.FC = () => {
         venue: venue.trim() || undefined,
         doi: doi.trim() || undefined,
         total_pages: !isNaN(parsedPages as number) ? parsedPages : undefined,
-        current_page: status === 'read' ? parsedPages : 0,
-        progress: status === 'read' ? 100 : 0,
+        current_page: computedPage,
+        progress: computedProgress,
       });
 
       Alert.alert('Document Added', `"${created.title}" was saved to your library.`);
@@ -618,23 +643,55 @@ export const AddDocumentScreen: React.FC = () => {
         {(type === 'book' || type === 'course_material') && (
           <View style={styles.inputGroup}>
             <Text style={[styles.sectionLabel, { color: colors.text, marginTop: 14 }]}>
-              Total Pages (For progress calculation)
+              Page Tracking & Progress
             </Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                {
-                  backgroundColor: isDark ? colors.surfaceSecondary : '#F1F5F9',
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
-              ]}
-              placeholder="e.g. 560"
-              placeholderTextColor={colors.textMuted}
-              keyboardType="number-pad"
-              value={totalPages}
-              onChangeText={setTotalPages}
-            />
+
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+                  Total Pages *
+                </Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: isDark ? colors.surfaceSecondary : '#F1F5F9',
+                      color: colors.text,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  placeholder="e.g. 560"
+                  placeholderTextColor={colors.textMuted}
+                  keyboardType="number-pad"
+                  value={totalPages}
+                  onChangeText={setTotalPages}
+                />
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
+                  Starting Page (Default 0)
+                </Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: isDark ? colors.surfaceSecondary : '#F1F5F9',
+                      color: colors.text,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  placeholder="0"
+                  placeholderTextColor={colors.textMuted}
+                  keyboardType="number-pad"
+                  value={startingPage}
+                  onChangeText={setStartingPage}
+                />
+              </View>
+            </View>
+            <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 4 }}>
+              Initially 0. You can increment pages and open your linked PDF anytime with 1 tap.
+            </Text>
           </View>
         )}
 

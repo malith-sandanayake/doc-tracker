@@ -18,7 +18,7 @@ import { TypeBadge, StatusBadge, PriorityBadge, TagBadge } from '../components/c
 import { ProgressBar } from '../components/common/ProgressBar';
 import { NoteItem } from '../components/notes/NoteItem';
 import { AddNoteInput } from '../components/notes/AddNoteInput';
-import { openDocument } from '../services/fileService';
+import { openDocument, pickDocument } from '../services/fileService';
 import { RootStackParamList, DocumentStatus } from '../types';
 
 export const DocumentDetailScreen: React.FC = () => {
@@ -62,6 +62,21 @@ export const DocumentDetailScreen: React.FC = () => {
 
   const handleOpenSource = async () => {
     await openDocument(doc.source);
+  };
+
+  const handleLinkLocalPdf = async () => {
+    const file = await pickDocument();
+    if (file) {
+      await updateDocument(doc.id, {
+        source: {
+          type: 'file_uri',
+          uri: file.uri,
+          fileName: file.fileName,
+          mimeType: file.mimeType,
+        },
+      });
+      Alert.alert('PDF Linked', `"${file.fileName}" has been linked to this document.`);
+    }
   };
 
   const handleStatusChange = (status: DocumentStatus) => {
@@ -213,6 +228,23 @@ export const DocumentDetailScreen: React.FC = () => {
               {sourceInfo.detail}
             </Text>
           </View>
+          <TouchableOpacity
+            onPress={handleLinkLocalPdf}
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              borderRadius: 8,
+              backgroundColor: colors.primaryLight,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
+            <Ionicons name="attach" size={14} color={colors.primary} />
+            <Text style={{ fontSize: 11, fontWeight: '700', color: colors.primary }}>
+              {doc.source.type === 'file_uri' ? 'Change PDF' : 'Link PDF'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Research Paper Specific Metadata Box */}
@@ -481,6 +513,67 @@ export const DocumentDetailScreen: React.FC = () => {
               )}
             </View>
           )}
+        </View>
+
+        {/* AI Chapter Summarizer Teaser Card */}
+        <View
+          style={[
+            styles.infoBox,
+            {
+              backgroundColor: isDark ? '#1E1B4B' : '#EEF2FF',
+              borderColor: isDark ? '#3730A3' : '#C7D2FE',
+            },
+          ]}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 6,
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Ionicons name="sparkles" size={16} color="#6366F1" />
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#6366F1' }}>
+                AI Assistant
+              </Text>
+            </View>
+            <Text style={{ fontSize: 10, fontWeight: '600', color: isDark ? '#A5B4FC' : '#4F46E5' }}>
+              LLM Ready
+            </Text>
+          </View>
+
+          <Text style={{ fontSize: 14, fontWeight: '700', color: colors.text, marginBottom: 4 }}>
+            Chapter Summarizer & Key Concepts
+          </Text>
+          <Text style={{ fontSize: 12, color: colors.textSecondary, lineHeight: 17, marginBottom: 10 }}>
+            LLM Summarization Engine will allow you to generate chapter summaries, quiz flashcards,
+            and concept explanations directly from this linked textbook PDF.
+          </Text>
+
+          <TouchableOpacity
+            onPress={() =>
+              Alert.alert(
+                'AI Summarizer',
+                'LLM summarization will be enabled in the upcoming update. You will be able to connect your model or API key to generate chapter summaries and flashcards!'
+              )
+            }
+            style={{
+              backgroundColor: '#6366F1',
+              paddingVertical: 9,
+              borderRadius: 8,
+              alignItems: 'center',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              gap: 6,
+            }}
+          >
+            <Ionicons name="sparkles-outline" size={15} color="#FFFFFF" />
+            <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>
+              Generate Summary with AI (Coming Soon)
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Rating Stars (Post-Read) */}

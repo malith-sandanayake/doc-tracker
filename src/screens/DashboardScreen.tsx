@@ -121,7 +121,8 @@ export const DashboardScreen: React.FC = () => {
 
         {/* Quick Category Chips */}
         <View style={styles.categoryBar}>
-          <View
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ResearchPapers')}
             style={[
               styles.categoryPill,
               { backgroundColor: isDark ? colors.surfaceSecondary : '#F1F5F9' },
@@ -131,8 +132,9 @@ export const DashboardScreen: React.FC = () => {
             <Text style={[styles.categoryPillText, { color: colors.text }]}>
               {stats.researchPapersCount} Papers
             </Text>
-          </View>
-          <View
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Books')}
             style={[
               styles.categoryPill,
               { backgroundColor: isDark ? colors.surfaceSecondary : '#F1F5F9' },
@@ -142,8 +144,14 @@ export const DashboardScreen: React.FC = () => {
             <Text style={[styles.categoryPillText, { color: colors.text }]}>
               {stats.booksCount} Books
             </Text>
-          </View>
-          <View
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('MainTabs' as any, {
+                screen: 'Library',
+                params: { initialTypeFilter: 'course_material' },
+              } as any)
+            }
             style={[
               styles.categoryPill,
               { backgroundColor: isDark ? colors.surfaceSecondary : '#F1F5F9' },
@@ -153,7 +161,7 @@ export const DashboardScreen: React.FC = () => {
             <Text style={[styles.categoryPillText, { color: colors.text }]}>
               {stats.coursesCount} Courses
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Continue Reading Section */}

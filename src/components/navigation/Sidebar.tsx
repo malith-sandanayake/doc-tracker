@@ -21,6 +21,7 @@ import {
   navigateToDashboard,
   navigateToLibrary,
   navigateToResearchPapers,
+  navigateToBooks,
   navigateToGoals,
   navigateToAddDocument,
 } from '../../navigation/navigationRef';
@@ -331,6 +332,21 @@ export const Sidebar: React.FC = () => {
 
               <TouchableOpacity
                 style={styles.navItem}
+                onPress={() => handleNav(() => navigateToBooks())}
+              >
+                <View style={[styles.navIconBox, { backgroundColor: colors.surfaceSecondary }]}>
+                  <Ionicons name="book-outline" size={17} color="#A21CAF" />
+                </View>
+                <Text style={[styles.navItemLabel, { color: colors.text }]}>Books & Textbooks</Text>
+                <View style={[styles.badge, { backgroundColor: colors.surfaceSecondary }]}>
+                  <Text style={[styles.badgeText, { color: colors.textSecondary }]}>
+                    {stats.booksCount}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.navItem}
                 onPress={() => handleNav(() => navigateToGoals())}
               >
                 <View style={[styles.navIconBox, { backgroundColor: colors.surfaceSecondary }]}>
@@ -378,7 +394,7 @@ export const Sidebar: React.FC = () => {
 
               <TouchableOpacity
                 style={styles.navItem}
-                onPress={() => handleNav(() => navigateToLibrary({ initialTypeFilter: 'book' }))}
+                onPress={() => handleNav(() => navigateToBooks())}
               >
                 <View style={[styles.navIconBox, { backgroundColor: colors.surfaceSecondary }]}>
                   <Ionicons name="book-outline" size={17} color="#A21CAF" />

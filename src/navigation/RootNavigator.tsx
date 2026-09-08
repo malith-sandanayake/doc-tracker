@@ -4,6 +4,7 @@ import { TabNavigator } from './TabNavigator';
 import { DocumentDetailScreen } from '../screens/DocumentDetailScreen';
 import { AddDocumentScreen } from '../screens/AddDocumentScreen';
 import { ResearchPapersScreen } from '../screens/ResearchPapersScreen';
+import { BooksScreen } from '../screens/BooksScreen';
 import { RootStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -35,6 +36,13 @@ export const RootNavigator: React.FC = () => {
       <Stack.Screen
         name="ResearchPapers"
         component={ResearchPapersScreen}
+        options={{
+          animation: 'slide_from_right',
+        }}
+      />
+      <Stack.Screen
+        name="Books"
+        component={BooksScreen}
         options={{
           animation: 'slide_from_right',
         }}

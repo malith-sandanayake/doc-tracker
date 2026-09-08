@@ -44,8 +44,15 @@ export const navigateToResearchPapers = () => {
   }
 };
 
+export const navigateToBooks = () => {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate('Books');
+  }
+};
+
 export const navigateToDocumentDetail = (documentId: string) => {
   if (navigationRef.isReady()) {
     navigationRef.navigate('DocumentDetail', { documentId });
   }
 };
+
