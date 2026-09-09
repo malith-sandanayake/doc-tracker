@@ -56,3 +56,9 @@ export const navigateToDocumentDetail = (documentId: string) => {
   }
 };
 
+export const navigateToSettings = () => {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate('Settings');
+  }
+};
+

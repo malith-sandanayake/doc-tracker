@@ -76,6 +76,7 @@ export type RootStackParamList = {
   EditDocument: { documentId: string };
   ResearchPapers: undefined;
   Books: undefined;
+  Settings: undefined;
 };
 
 export type MainTabParamList = {

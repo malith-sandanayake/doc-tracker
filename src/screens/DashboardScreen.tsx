@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
-  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -22,7 +21,7 @@ import { RootStackParamList } from '../types';
 export const DashboardScreen: React.FC = () => {
   const { colors, isDark } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { documents, goals, stats, isLoading, refreshData, resetToSeedData, updateDocumentStatus } =
+  const { documents, goals, stats, isLoading, refreshData, updateDocumentStatus } =
     useDocuments();
 
   const [refreshing, setRefreshing] = React.useState(false);
@@ -36,26 +35,14 @@ export const DashboardScreen: React.FC = () => {
   const inProgressDocs = documents.filter((d) => d.status === 'in_progress');
   const activeGoals = goals.filter((g) => g.status === 'active');
 
-  const handleResetConfirm = () => {
-    Alert.alert(
-      'Reset Demo Data',
-      'Reset library to Year 3 Computer Engineering sample documents, notes, and goals?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Reset', style: 'destructive', onPress: () => resetToSeedData() },
-      ]
-    );
-  };
-
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <Header
         title="DocTrack"
         subtitle="Year 3 • Computer Engineering Library"
         rightAction={{
-          icon: 'refresh-circle-outline',
-          onPress: handleResetConfirm,
-          label: 'Reset Demo',
+          icon: 'settings-outline',
+          onPress: () => navigation.navigate('Settings'),
         }}
       />
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   Animated,
   Dimensions,
   Modal,
-  Alert,
   TouchableWithoutFeedback,
   PanResponder,
 } from 'react-native';
@@ -24,7 +23,10 @@ import {
   navigateToBooks,
   navigateToGoals,
   navigateToAddDocument,
+  navigateToSettings,
 } from '../../navigation/navigationRef';
+import { ConfirmModal } from '../common/ConfirmModal';
+import { showAlert } from '../../utils/alert';
 import { DocumentType, DocumentStatus } from '../../types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -35,6 +37,9 @@ export const Sidebar: React.FC = () => {
   const { isSidebarOpen, closeSidebar } = useSidebar();
   const { documents, goals, stats, refreshData, resetToSeedData } = useDocuments();
   const insets = useSafeAreaInsets();
+
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const anim = useRef(new Animated.Value(0)).current;
 
@@ -105,25 +110,19 @@ export const Sidebar: React.FC = () => {
     return Math.round((stats.readCount / stats.totalCount) * 100);
   }, [stats.totalCount, stats.readCount]);
 
-  const handleResetConfirm = () => {
-    handleClose();
-    setTimeout(() => {
-      Alert.alert(
-        'Reset Demo Data',
-        'Reset library to original Year 3 Computer Engineering sample documents, notes, and reading goals?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Reset Library',
-            style: 'destructive',
-            onPress: async () => {
-              await resetToSeedData();
-              Alert.alert('Reset Complete', 'Library has been reset to default curriculum data.');
-            },
-          },
-        ]
-      );
-    }, 200);
+  const handleResetConfirm = async () => {
+    try {
+      setIsResetting(true);
+      await resetToSeedData();
+      setIsResetModalOpen(false);
+      handleClose();
+      showAlert('Reset Complete', 'Library has been reset to default curriculum data.');
+    } catch (e) {
+      setIsResetModalOpen(false);
+      showAlert('Error', 'Failed to reset library data.');
+    } finally {
+      setIsResetting(false);
+    }
   };
 
   const handleRefresh = async () => {
@@ -371,6 +370,16 @@ export const Sidebar: React.FC = () => {
                   Add Document
                 </Text>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.navItem}
+                onPress={() => handleNav(() => navigateToSettings())}
+              >
+                <View style={[styles.navIconBox, { backgroundColor: colors.surfaceSecondary }]}>
+                  <Ionicons name="settings-outline" size={17} color={colors.text} />
+                </View>
+                <Text style={[styles.navItemLabel, { color: colors.text }]}>Settings</Text>
+              </TouchableOpacity>
             </View>
 
             {/* Document Categories Section */}
@@ -539,9 +548,15 @@ export const Sidebar: React.FC = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Appearance / Theme Selector */}
+            {/* Settings & Appearance Section */}
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>APPEARANCE</Text>
+              <View style={styles.sectionHeaderRow}>
+                <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>SETTINGS</Text>
+                <TouchableOpacity onPress={() => handleNav(() => navigateToSettings())}>
+                  <Text style={[styles.sectionActionLink, { color: colors.primary }]}>More</Text>
+                </TouchableOpacity>
+              </View>
+
               <View
                 style={[
                   styles.themeSelector,
@@ -635,13 +650,14 @@ export const Sidebar: React.FC = () => {
                   </Text>
                 </TouchableOpacity>
               </View>
-            </View>
 
-            {/* Reset Demo Data Action */}
-            <View style={styles.section}>
+              {/* Reset Demo Data Action */}
               <TouchableOpacity
-                onPress={handleResetConfirm}
-                style={[styles.resetButton, { backgroundColor: isDark ? '#451a1a' : '#FEF2F2' }]}
+                onPress={() => setIsResetModalOpen(true)}
+                style={[
+                  styles.resetButton,
+                  { backgroundColor: isDark ? '#451a1a' : '#FEF2F2', marginTop: 10 },
+                ]}
               >
                 <Ionicons name="refresh-circle-outline" size={18} color="#EF4444" />
                 <Text style={styles.resetButtonText}>Reset Demo Data</Text>
@@ -663,6 +679,21 @@ export const Sidebar: React.FC = () => {
           </View>
         </Animated.View>
       </View>
+
+      <ConfirmModal
+        visible={isResetModalOpen}
+        title="Reset Demo Data"
+        message="Reset library to original Year 3 Computer Engineering sample documents, notes, and reading goals?"
+        confirmText="Reset Library"
+        cancelText="Cancel"
+        isDestructive={true}
+        icon="alert-circle-outline"
+        isLoading={isResetting}
+        onConfirm={handleResetConfirm}
+        onCancel={() => {
+          if (!isResetting) setIsResetModalOpen(false);
+        }}
+      />
     </Modal>
   );
 };
@@ -797,6 +828,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.8,
     paddingHorizontal: 8,
+    marginBottom: 6,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: 8,
+  },
+  sectionActionLink: {
+    fontSize: 11,
+    fontWeight: '600',
     marginBottom: 6,
   },
   navItem: {
